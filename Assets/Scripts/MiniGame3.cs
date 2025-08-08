@@ -1,11 +1,12 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class MiniGame3 : MonoBehaviour, IMiniGame
 {
-    public RectTransform playArea; // UI panel veya Canvas altı alan
-    public GameObject dotPrefab;   // küçük basılabilir nokta prefabı
+    public RectTransform playArea;
+    public GameObject dotPrefab;
     public TMP_Text timerText;
     public TMP_Text feedbackText;
 
@@ -13,22 +14,26 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
     private bool gameActive;
     private bool success;
 
-    private int requiredHits;
-    private int currentHits;
-
     public float baseTimeLimit = 10f;
-    public int baseRequiredHits = 3;
+    public int dotsToDestroyForWin = 3;  // Başlangıçta kaç dot yok etmen gerekiyor
+    public int clicksPerDot = 10;         // Her dot kaç kere tıklanmalı
+
+    private int destroyedDots = 0;
+
+    private Dictionary<GameObject, int> dotClickCounts = new();
 
     public void StartMiniGame(int difficultyLevel)
     {
-        requiredHits = baseRequiredHits + difficultyLevel - 1;
         timer = baseTimeLimit;
-        currentHits = 0;
+        destroyedDots = 0;
         gameActive = true;
         success = false;
         feedbackText.text = "";
         timerText.text = "";
-        SpawnDots(requiredHits);
+
+        int dotCount = dotsToDestroyForWin + (difficultyLevel - 1) * 2;
+        SpawnDots(dotCount);
+
         playArea.gameObject.SetActive(true);
     }
 
@@ -47,7 +52,7 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
             ClearDots();
             playArea.gameObject.SetActive(false);
         }
-        else if (currentHits >= requiredHits)
+        else if (destroyedDots >= dotsToDestroyForWin)
         {
             gameActive = false;
             success = true;
@@ -60,23 +65,39 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
     void SpawnDots(int count)
     {
         ClearDots();
+        dotClickCounts.Clear();
+
+        Vector2 size = playArea.rect.size;
 
         for (int i = 0; i < count; i++)
         {
             GameObject dot = Instantiate(dotPrefab, playArea);
-            dot.GetComponent<Button>().onClick.RemoveAllListeners();
-            dot.GetComponent<Button>().onClick.AddListener(() =>
+            dot.SetActive(true);
+            dotClickCounts[dot] = clicksPerDot;
+
+            Button btn = dot.GetComponent<Button>();
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() =>
             {
-                currentHits++;
-                dot.SetActive(false);
+                Debug.Log("Dot clicked!");
+
+                if (!gameActive) return;
+
+                dotClickCounts[dot]--;
+
+                if (dotClickCounts[dot] <= 0)
+                {
+                    destroyedDots++;
+                    dot.SetActive(false);
+                    dotClickCounts.Remove(dot);
+                }
             });
 
-            // Rastgele pozisyon: playArea içinde
-            Vector2 size = playArea.rect.size;
             Vector2 randomPos = new Vector2(
                 Random.Range(0, size.x),
                 Random.Range(0, size.y)
             );
+
             dot.GetComponent<RectTransform>().anchoredPosition = randomPos;
         }
     }
@@ -85,6 +106,8 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
     {
         foreach (Transform child in playArea)
             Destroy(child.gameObject);
+
+        dotClickCounts.Clear();
     }
 
     public void CloseMiniGame()
