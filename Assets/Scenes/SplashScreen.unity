@@ -20226,7 +20226,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 2.76, y: 0.79, z: -9.59}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20467,8 +20467,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1995112125
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 8c3c6fa734a126f4fae1e471f2a26de2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -21373,12 +21373,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 853bad19c93906c47b5d2768321440ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectPooler: {fileID: 1062948161}
+  monsterPrefab: {fileID: 1970428685866433983}
   spawnPoints:
   - {fileID: 1344210098}
   - {fileID: 324988646}
   - {fileID: 1279502389}
+  maxDivisionCount: 1
   spawnInterval: 1
+  poolSize: 20
 --- !u!4 &1658972938
 Transform:
   m_ObjectHideFlags: 0
@@ -21388,7 +21390,7 @@ Transform:
   m_GameObject: {fileID: 1658972936}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.30801982, y: -0.122898206, z: -9.925965}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21480,6 +21482,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2046376962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2046376963}
+  m_Layer: 0
+  m_Name: GameManagers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2046376963
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046376962}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.782413, y: -0.17718077, z: -9.930365}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1970428685866433982
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21488,6 +21521,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1769284900000096126, guid: ebe5528534044694e8229085cd2f0ec0, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1769284900000096126, guid: ebe5528534044694e8229085cd2f0ec0, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 1995112125
+      objectReference: {fileID: 0}
     - target: {fileID: 2781075947473702830, guid: ebe5528534044694e8229085cd2f0ec0, type: 3}
       propertyPath: m_Name
       value: hero_spritesheet_0
@@ -21557,9 +21598,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb22c053fb1be4c44ac7590e0901e362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilemap: {fileID: 0}
+  tilemap: {fileID: 939016720}
   moveInterval: 1
   moveSpeed: 2
+  baseLifeTime: 10
+  extraLifeTime: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -21582,3 +21625,4 @@ SceneRoots:
   - {fileID: 698314648}
   - {fileID: 337318970}
   - {fileID: 1066251477}
+  - {fileID: 2046376963}
