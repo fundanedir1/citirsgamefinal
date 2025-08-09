@@ -1,8 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class MiniGameManager1 : MonoBehaviour
 {
-    public MonoBehaviour[] miniGameScripts; // Inspector’da IMiniGame implement eden scriptler (MiniGame1, MiniGame2, MiniGame3)
+    public MonoBehaviour[] miniGameScripts;
+    public TMP_Text[] timerTexts;
+    public TMP_Text[] feedbackTexts;
 
     private IMiniGame[] miniGames;
     private IMiniGame currentMiniGame;
@@ -10,8 +15,12 @@ public class MiniGameManager1 : MonoBehaviour
 
     private int[] difficultyCounters;
 
-    private float timeSinceLastMiniGame = 0f;
-    public float minigameCooldown = 15f; // Mini oyunlar arası bekleme süresi
+    public float firstMiniGameDelay = 5f;
+    public float miniGameDuration = 10f;
+    public float feedbackDisplayTime = 3f;
+    public float waitBetweenMiniGames = 2f;
+
+    private Coroutine timerCoroutine;
 
     void Awake()
     {
@@ -19,52 +28,117 @@ public class MiniGameManager1 : MonoBehaviour
         for (int i = 0; i < miniGameScripts.Length; i++)
         {
             miniGames[i] = miniGameScripts[i] as IMiniGame;
+
+            if (timerTexts != null && i < timerTexts.Length && timerTexts[i] != null)
+                timerTexts[i].gameObject.SetActive(false);
+            if (feedbackTexts != null && i < feedbackTexts.Length && feedbackTexts[i] != null)
+                feedbackTexts[i].gameObject.SetActive(false);
         }
 
         difficultyCounters = new int[miniGames.Length];
     }
 
-    void Update()
+    void Start()
     {
-        if (currentMiniGame != null)
+        StartCoroutine(MiniGameLoop());
+    }
+
+    IEnumerator MiniGameLoop()
+    {
+        yield return new WaitForSeconds(firstMiniGameDelay);
+
+        while (true)
         {
-            // Mini oyun aktifse güncelle
-            currentMiniGame.UpdateMiniGame();
+            int randomIndex = Random.Range(0, miniGames.Length);
+            currentMiniGameIndex = randomIndex;
+            currentMiniGame = miniGames[randomIndex];
+            int difficulty = difficultyCounters[randomIndex] + 1;
 
-            if (currentMiniGame.IsFinished)
+            // Timer ve feedback textlerini göster (feedback boş)
+            if (timerTexts != null && timerTexts[randomIndex] != null)
+                timerTexts[randomIndex].gameObject.SetActive(true);
+            if (feedbackTexts != null && feedbackTexts[randomIndex] != null)
             {
-                if (currentMiniGame.IsSuccess)
-                {
-                    difficultyCounters[currentMiniGameIndex]++;
-                    // Başarı ödülleri veya oyun içi etkiler buraya
-                }
+                feedbackTexts[randomIndex].gameObject.SetActive(true);
+                feedbackTexts[randomIndex].text = "";
+            }
 
+            currentMiniGame.StartMiniGame(difficulty);
+
+            // Timer coroutine başlat
+            if (timerCoroutine != null)
+                StopCoroutine(timerCoroutine);
+            timerCoroutine = StartCoroutine(UpdateTimer(randomIndex));
+
+            // Mini oyun bitene kadar bekle veya süre dolana kadar
+            float timer = miniGameDuration;
+            while (timer > 0 && !currentMiniGame.IsFinished)
+            {
+                timer -= Time.deltaTime;
+                yield return null;
+            }
+
+            // Eğer süre dolduysa oyun zorla kapatılır
+            if (!currentMiniGame.IsFinished)
+            {
                 currentMiniGame.CloseMiniGame();
                 currentMiniGame = null;
-                timeSinceLastMiniGame = 0f;
             }
-        }
-        else
-        {
-            // Mini oyun yoksa zaman sayar ve cooldown sonrası mini oyun başlatır
-            timeSinceLastMiniGame += Time.deltaTime;
 
-            if (timeSinceLastMiniGame >= minigameCooldown)
+            // Timer text gizle
+            if (timerTexts != null && timerTexts[randomIndex] != null)
             {
-                StartRandomMiniGame();
+                timerTexts[randomIndex].gameObject.SetActive(false);
+                timerTexts[randomIndex].text = "";
             }
 
-            // Ana oyun burada normal akışına devam eder
+            // Timer coroutine durdur
+            if (timerCoroutine != null)
+            {
+                StopCoroutine(timerCoroutine);
+                timerCoroutine = null;
+            }
+
+            // Feedback göster
+            if (currentMiniGame != null && currentMiniGame.IsSuccess)
+            {
+                difficultyCounters[randomIndex]++;
+                if (feedbackTexts != null && feedbackTexts[randomIndex] != null)
+                    feedbackTexts[randomIndex].text = "Success!";
+            }
+            else
+            {
+                if (feedbackTexts != null && feedbackTexts[randomIndex] != null)
+                    feedbackTexts[randomIndex].text = "Failed or Time Out!";
+            }
+
+            yield return new WaitForSeconds(feedbackDisplayTime);
+
+            // Feedback gizle
+            if (feedbackTexts != null && feedbackTexts[randomIndex] != null)
+                feedbackTexts[randomIndex].gameObject.SetActive(false);
+
+            currentMiniGame = null;
+
+            yield return new WaitForSeconds(waitBetweenMiniGames);
         }
     }
 
-    void StartRandomMiniGame()
+    IEnumerator UpdateTimer(int index)
     {
-        int randomIndex = Random.Range(0, miniGames.Length);
-        currentMiniGameIndex = randomIndex;
-        currentMiniGame = miniGames[randomIndex];
+        float timer = miniGameDuration;
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime;
+            if (timerTexts != null && index < timerTexts.Length && timerTexts[index] != null)
+                timerTexts[index].text = $"Time: {timer:F1}s";
+            yield return null;
+        }
+    }
 
-        int difficulty = difficultyCounters[randomIndex] + 1;
-        currentMiniGame.StartMiniGame(difficulty);
+    void Update()
+    {
+        if (currentMiniGame != null)
+            currentMiniGame.UpdateMiniGame();
     }
 }

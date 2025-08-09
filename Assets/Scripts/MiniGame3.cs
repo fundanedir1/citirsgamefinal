@@ -15,12 +15,14 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
     private bool success;
 
     public float baseTimeLimit = 10f;
-    public int dotsToDestroyForWin = 3;  // Başlangıçta kaç dot yok etmen gerekiyor
-    public int clicksPerDot = 10;         // Her dot kaç kere tıklanmalı
+    public int baseDotsToDestroyForWin = 3;  // İlk oyunda yok edilecek dot sayısı
+    public int clicksPerDot = 10;            // Her dot'a tıklama sayısı
 
     private int destroyedDots = 0;
+    private int currentTargetDots = 0;       // Bu turda yok edilmesi gereken dot sayısı
 
     private Dictionary<GameObject, int> dotClickCounts = new();
+    private int totalRoundsPlayed = 0;       // Kaç kere oynandığını takip etmek için
 
     public void StartMiniGame(int difficultyLevel)
     {
@@ -31,8 +33,11 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
         feedbackText.text = "";
         timerText.text = "";
 
-        int dotCount = dotsToDestroyForWin + (difficultyLevel - 1) * 2;
-        SpawnDots(dotCount);
+        // Her oynanışta hedef dot sayısını artır
+        currentTargetDots = baseDotsToDestroyForWin + totalRoundsPlayed;
+        totalRoundsPlayed++;
+
+        SpawnDots(currentTargetDots);
 
         playArea.gameObject.SetActive(true);
     }
@@ -44,21 +49,15 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
         timer -= Time.deltaTime;
         timerText.text = "Time: " + Mathf.Ceil(timer).ToString();
 
+        // Zaman doldu
         if (timer <= 0f)
         {
-            gameActive = false;
-            success = false;
-            feedbackText.text = "Time's up! Fail.";
-            ClearDots();
-            playArea.gameObject.SetActive(false);
+            EndGame(false, "Time's up! Fail.");
         }
-        else if (destroyedDots >= dotsToDestroyForWin)
+        // Tüm hedef dotlar yok edildi
+        else if (destroyedDots >= currentTargetDots)
         {
-            gameActive = false;
-            success = true;
-            feedbackText.text = "Success!";
-            ClearDots();
-            playArea.gameObject.SetActive(false);
+            EndGame(true, "Success!");
         }
     }
 
@@ -79,8 +78,6 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
             btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(() =>
             {
-                Debug.Log("Dot clicked!");
-
                 if (!gameActive) return;
 
                 dotClickCounts[dot]--;
@@ -93,11 +90,11 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
                 }
             });
 
+            // Rastgele konum
             Vector2 randomPos = new Vector2(
                 Random.Range(0, size.x),
                 Random.Range(0, size.y)
             );
-
             dot.GetComponent<RectTransform>().anchoredPosition = randomPos;
         }
     }
@@ -108,12 +105,20 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
             Destroy(child.gameObject);
 
         dotClickCounts.Clear();
+        playArea.gameObject.SetActive(false); // Alanı da kapat
+    }
+
+    void EndGame(bool win, string message)
+    {
+        gameActive = false;
+        success = win;
+        feedbackText.text = message;
+        ClearDots(); // Artık burada SetActive(false) otomatik olacak
     }
 
     public void CloseMiniGame()
     {
-        ClearDots();
-        playArea.gameObject.SetActive(false);
+        ClearDots(); // Artık burada da ayrıca kapatmaya gerek yok
         feedbackText.text = "";
         timerText.text = "";
     }

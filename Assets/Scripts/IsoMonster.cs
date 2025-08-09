@@ -15,7 +15,7 @@ public class IsoMonster : MonoBehaviour
 
     private Vector3Int[] directions = new Vector3Int[]
     {
-        new Vector3Int(1, 0, 0),    // sağ
+        new Vector3Int(5, 0, 0),    // sağ
         new Vector3Int(-1, 0, 0),   // sol
         new Vector3Int(0, 1, 0),    // yukarı
         new Vector3Int(0, -1, 0),   // aşağı
