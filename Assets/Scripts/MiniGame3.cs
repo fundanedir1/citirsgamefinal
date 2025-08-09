@@ -66,7 +66,7 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
         ClearDots();
         dotClickCounts.Clear();
 
-        Vector2 size = playArea.rect.size;
+        Vector2 size = playArea.rect.size/2;
 
         for (int i = 0; i < count; i++)
         {
