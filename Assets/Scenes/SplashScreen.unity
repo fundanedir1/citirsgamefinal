@@ -537,10 +537,10 @@ MonoBehaviour:
   - {fileID: 380033035}
   - {fileID: 1412379206}
   - {fileID: 776689976}
-  firstMiniGameDelay: 5
+  firstMiniGameDelay: 3
   miniGameDuration: 10
-  feedbackDisplayTime: 3
-  waitBetweenMiniGames: 10
+  feedbackDisplayTime: 2
+  waitBetweenMiniGames: 2
 --- !u!4 &337318970
 Transform:
   m_ObjectHideFlags: 0
@@ -20397,6 +20397,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 1970428685866433983}
   poolSize: 20
+  expandable: 1
 --- !u!4 &1062948162
 Transform:
   m_ObjectHideFlags: 0
@@ -21373,14 +21374,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 853bad19c93906c47b5d2768321440ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monsterPrefab: {fileID: 1970428685866433983}
+  pooler: {fileID: 1062948161}
   spawnPoints:
   - {fileID: 1344210098}
   - {fileID: 324988646}
   - {fileID: 1279502389}
-  maxDivisionCount: 1
   spawnInterval: 1
-  poolSize: 20
+  maxDivisionCount: 1
 --- !u!4 &1658972938
 Transform:
   m_ObjectHideFlags: 0
