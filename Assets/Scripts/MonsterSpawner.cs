@@ -1,13 +1,27 @@
 ﻿using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    public ObjectPooler objectPooler;   // Object pool referansı
-    public Transform[] spawnPoints;     // Spawn noktaları
-    public float spawnInterval = 1f;    // Kaç saniyede bir spawn
+    [Header("Spawn Settings")]
+    public ObjectPooler pooler; // ObjectPooler referansı
+    public Transform[] spawnPoints;
+    public float spawnInterval = 5f;
+
+    [Header("Monster Division")]
+    public int maxDivisionCount = 1; // Eski kod uyumluluğu için
 
     private float spawnTimer;
+
+    void Start()
+    {
+        spawnTimer = spawnInterval;
+
+        if (pooler == null)
+            Debug.LogError("MonsterSpawner: ObjectPooler atanmadı!");
+
+        if (spawnPoints.Length == 0)
+            Debug.LogError("MonsterSpawner: Spawn noktası yok!");
+    }
 
     void Update()
     {
@@ -22,24 +36,30 @@ public class MonsterSpawner : MonoBehaviour
 
     void SpawnMonster()
     {
-        // Rastgele bir spawn noktası seç
-        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        if (pooler == null || spawnPoints.Length == 0)
+            return;
 
-        // Havuzdan bir canavar objesi al
-        GameObject monster = objectPooler.GetPooledObject();
-
-        if (monster != null)
+        GameObject monster = pooler.GetPooledObject();
+        if (monster == null)
         {
-            monster.transform.position = spawnPoint.position;
-            monster.transform.rotation = Quaternion.identity;
-            monster.SetActive(true);
+            Debug.LogWarning("Havuzda uygun monster bulunamadı!");
+            return;
+        }
 
-            // Tilemap referansını ver (eğer yoksa)
-            IsoMonster isoMonster = monster.GetComponent<IsoMonster>();
-            if (isoMonster != null && isoMonster.tilemap == null)
-            {
-                isoMonster.tilemap = FindObjectOfType<Tilemap>();
-            }
+        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        monster.transform.position = spawnPoint.position;
+        monster.transform.rotation = Quaternion.identity;
+        monster.SetActive(true);
+
+        Debug.Log($"Monster spawn edildi: {spawnPoint.position}");
+    }
+
+    // Eski kodlarla uyumlu: Monster'ı havuza geri döndür
+    public void ReturnMonsterToPool(GameObject monster)
+    {
+        if (pooler != null && monster != null)
+        {
+            pooler.ReturnToPool(monster);
         }
     }
 }

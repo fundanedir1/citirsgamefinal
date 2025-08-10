@@ -8,7 +8,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - environment
   - Water
   - UI
   - 
@@ -41,6 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: backgroundlayer
+  - name: forgroundlayer
     uniqueID: 1995112125
+    locked: 0
+  - name: environment
+    uniqueID: 835105959
     locked: 0

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class MiniGame3 : MonoBehaviour, IMiniGame
 {
+    public RewardManager rewardManager;  // Ödül sistemi referansı
+
     public RectTransform playArea;
     public GameObject dotPrefab;
     public TMP_Text timerText;
@@ -66,7 +68,7 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
         ClearDots();
         dotClickCounts.Clear();
 
-        Vector2 size = playArea.rect.size;
+        Vector2 size = playArea.rect.size / 2;
 
         for (int i = 0; i < count; i++)
         {
@@ -113,6 +115,13 @@ public class MiniGame3 : MonoBehaviour, IMiniGame
         gameActive = false;
         success = win;
         feedbackText.text = message;
+
+        // Başarı durumunda ödül ver
+        if (win && rewardManager != null)
+        {
+            rewardManager.GiveReward(MiniGameRewardType.IncreaseLifespan);
+        }
+
         ClearDots(); // Artık burada SetActive(false) otomatik olacak
     }
 
