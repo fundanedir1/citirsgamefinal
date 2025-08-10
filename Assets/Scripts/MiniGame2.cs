@@ -4,6 +4,8 @@ using System.Collections;
 
 public class MiniGame2 : MonoBehaviour, IMiniGame
 {
+    public RewardManager rewardManager;  // Ödül sistemi referansı
+
     public TMP_Text promptText;
     public TMP_InputField inputField;
     public TMP_Text timerText;
@@ -59,6 +61,13 @@ public class MiniGame2 : MonoBehaviour, IMiniGame
             // Başarılı
             gameActive = false;
             success = true;
+
+            // Ödül verme çağrısı burada
+            if (rewardManager != null)
+            {
+                rewardManager.GiveReward(MiniGameRewardType.IncreaseLifespan);
+            }
+
             StartCoroutine(EndGameWithFeedback("Success!"));
         }
     }
@@ -68,7 +77,7 @@ public class MiniGame2 : MonoBehaviour, IMiniGame
         // Feedback göster
         feedbackText.text = message;
 
-        // Input ve prompt hala açık kalsın feedback görünürken
+        // Input ve prompt kapatılıyor
         inputField.gameObject.SetActive(false);
         promptText.gameObject.SetActive(false);
         timerText.text = "";

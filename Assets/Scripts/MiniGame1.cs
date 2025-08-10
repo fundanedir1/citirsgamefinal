@@ -4,6 +4,8 @@ using TMPro;
 
 public class MiniGame1 : MonoBehaviour, IMiniGame
 {
+    public RewardManager rewardManager;  // Ödül sistemi için referans
+
     public Transform arrowContainer;
     public GameObject upArrowPrefab;
     public GameObject downArrowPrefab;
@@ -116,6 +118,12 @@ public class MiniGame1 : MonoBehaviour, IMiniGame
                 gameActive = false;
                 feedbackText.text = "Success!";
                 arrowContainer.gameObject.SetActive(false);
+
+                // Ödül verme çağrısı burada
+                if (rewardManager != null)
+                {
+                    rewardManager.GiveReward(MiniGameRewardType.IncreaseDivisionCount);
+                }
             }
         }
         else if (Input.anyKeyDown)
